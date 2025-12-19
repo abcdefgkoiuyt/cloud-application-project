@@ -1,0 +1,33 @@
+steps:
+  # 1) Install dependencies and build Next.js
+  - name: 'node:18'
+    id: 'install-and-build'
+    entrypoint: 'bash'
+    args:
+      - -lc
+      - |
+        npm ci
+        npm run gcp-build
+
+  # 2) Deploy to App Engine using gcloud
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    id: 'deploy-appengine'
+    entrypoint: 'bash'
+    args:
+      - -c
+      - |
+        set -e
+        echo "Deploying to App Engine in project $PROJECT_ID"
+        # Set environment variables for the runtime using substitutions
+        gcloud app deploy app.yaml --project="$PROJECT_ID" --quiet --promote \
+          --set-env-vars=INSTANCE_CONNECTION_NAME=$_INSTANCE_CONNECTION_NAME,SECRET_NAME=$_SECRET_NAME
+
+substitutions:
+  # Provide these when creating a build or trigger; Cloud Build will replace them.
+  _INSTANCE_CONNECTION_NAME: "focus-vertex-481519-n4:us-central1:cloud-project"
+  _SECRET_NAME: "db-credentials"
+
+timeout: "1200s"
+
+options:
+  substitution_option: ALLOW_LOOSE

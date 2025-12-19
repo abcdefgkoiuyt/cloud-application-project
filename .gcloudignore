@@ -1,0 +1,6 @@
+# This file specifies files that are *not* uploaded to Google Cloud Platform when using gcloud.
+node_modules/
+.next/
+npm-debug.log
+README.md
+.env
