@@ -1,31 +1,84 @@
 # Next.js sample app using Google Cloud (App Engine + Cloud SQL + Secret Manager)
 
-This sample shows a minimal Next.js app that reads database credentials from Google Secret Manager and connects to Cloud SQL (Postgres) on App Engine.
+This sample shows a Next.js app with a simple add/remove items interface that connects to Cloud SQL (PostgreSQL) on App Engine.
 
-Files added:
-- `pages/index.js` — simple UI that calls the API route
-- `pages/api/db.js` — server API that runs a small DB query
-- `lib/db.js` — connects to Cloud SQL using credentials from Secret Manager
+**Features:**
+- Add and delete items from Cloud SQL database
+- Clean table-based UI showing all items
+- Cloud Build CI/CD pipeline
+- Environment variable configuration (Secret Manager support available)
+
+**Files:**
+- `pages/index.js` — Main UI with items table and add/delete functionality
+- `pages/api/items.js` — API endpoint to GET all items or POST new item
+- `pages/api/items/[id].js` — API endpoint to DELETE item by ID
+- `pages/api/db.js` — Simple DB test endpoint
+- `lib/db.js` — Database connection pool manager
+- `scripts/init-db.sql` — Database schema and sample data
+- `scripts/init-db.js` — Migration runner script
 - `app.yaml` — App Engine configuration
-- `package.json` — scripts and dependencies
+- `cloudbuild.yaml` — Cloud Build configuration
 
-Quick overview
+## Quick Start
 
-- Store your DB credentials as a JSON secret in Secret Manager. The secret's payload should be JSON like:
+### 1. Initialize the database
 
+After deploying your app, run the migration to create the `items` table and insert sample data:
+
+```bash
+# Set environment variables matching your app.yaml
+export DB_USER="myuser"
+export DB_PASSWORD="Ashu@123"
+export DB_NAME="mydb"
+export INSTANCE_CONNECTION_NAME="focus-vertex-481519-n4:us-central1:cloud-project"
+
+# Run the migration (requires Cloud SQL Proxy or App Engine environment)
+node scripts/init-db.js
 ```
-{
-  "user": "dbuser",
-  "password": "secret-password",
-  "database": "mydb",
-  "host": "127.0.0.1",
-  "port": 5432
-}
+
+**Alternative:** Connect to Cloud SQL via Cloud SQL Proxy and run the SQL directly:
+
+```bash
+# Start Cloud SQL Proxy
+cloud-sql-proxy focus-vertex-481519-n4:us-central1:cloud-project
+
+# In another terminal, connect with psql
+psql "host=127.0.0.1 user=myuser dbname=mydb" < scripts/init-db.sql
 ```
 
-- If you prefer to connect via Cloud SQL Unix socket (recommended on App Engine), set the environment variable `INSTANCE_CONNECTION_NAME` and the app will use the socket path `/cloudsql/INSTANCE_CONNECTION_NAME`. For socket mode you still need `user`, `password`, and `database` in the secret, but `host`/`port` are not required.
+### 2. Deploy and test
 
-Deployment steps (high-level)
+The app is already configured for Cloud Build deployment. Push to trigger:
+
+```bash
+git add .
+git commit -m "Add items CRUD functionality"
+git push
+```
+
+Visit your App Engine URL to see the items table and add/remove items.
+
+## Database Schema
+
+The app uses a simple `items` table:
+
+```sql
+CREATE TABLE items (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+## API Endpoints
+
+- `GET /api/items` — List all items
+- `POST /api/items` — Add new item (body: `{name, description}`)
+- `DELETE /api/items/[id]` — Delete item by ID
+- `GET /api/db` — Test DB connection (returns current timestamp)
+
+## Deployment steps (high-level)
 
 1. Enable APIs and create resources:
 
