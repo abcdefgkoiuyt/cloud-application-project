@@ -9,10 +9,11 @@
     "start": "next start -p $PORT"
   },
   "dependencies": {
+    "@google-cloud/secret-manager": "^6.1.1",
+    "@protobufjs/base64": "^1.1.2",
     "next": "^14.0.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
     "pg": "^8.11.0",
-    "@google-cloud/secret-manager": "^4.12.0"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   }
 }
