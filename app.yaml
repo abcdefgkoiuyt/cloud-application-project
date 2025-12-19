@@ -8,9 +8,11 @@ beta_settings:
   cloud_sql_instances: "focus-vertex-481519-n4:us-central1:cloud-project"
 
 env_variables:
-  # The name of the secret (in Secret Manager) that contains DB credentials JSON
-  SECRET_NAME: "db-credentials"
-  # Optionally set the instance connection name here too (or set when deploying)
+  # DB credentials (bypassing Secret Manager for now)
+  DB_USER: "myuser"
+  DB_PASSWORD: "Ashu@123"
+  DB_NAME: "mydb"
+  # Cloud SQL instance connection name
   INSTANCE_CONNECTION_NAME: "focus-vertex-481519-n4:us-central1:cloud-project"
 
 # Use gcp-build script to build Next.js during deployment
