@@ -19,8 +19,7 @@ steps:
         set -e
         echo "Deploying to App Engine in project $PROJECT_ID"
         # Set environment variables for the runtime using substitutions
-        gcloud app deploy app.yaml --project="$PROJECT_ID" --quiet --promote \
-          --set-env-vars=INSTANCE_CONNECTION_NAME=$_INSTANCE_CONNECTION_NAME,SECRET_NAME=$_SECRET_NAME
+        gcloud app deploy app.yaml --project="$PROJECT_ID" --quiet --promote
 
 substitutions:
   # Provide these when creating a build or trigger; Cloud Build will replace them.
